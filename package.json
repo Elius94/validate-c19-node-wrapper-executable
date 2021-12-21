@@ -1,5 +1,41 @@
 {
-  "dependencies": {
-    "verificac19-sdk": "^0.5.1"
-  }
+    "dependencies": {
+        "verificac19-sdk": "^0.5.1"
+    },
+    "devDependencies": {
+        "bluebird": "^3.7.2",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "child_process": "^1.0.2",
+        "mocha": "^6.0.2",
+        "mocha-generators": "^2.0.0",
+        "pkg": "latest",
+        "sinon": "^7.2.4"
+    },
+    "name": "validate-c19-node-wrapper-executable",
+    "description": "A nodejs wrapper to check gp for Covid 19 using the official APIs",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "test": "mocha --timeout 10000",
+        "start": "node checkdgc.js",
+        "build-windows": "npm run test && pkg -t node16-win-x64 --out-path bin/win/x64/ checkdgc.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Elius94/validate-c19-node-wrapper-executable.git"
+    },
+    "keywords": [
+        "covid",
+        "covid19",
+        "greenpass",
+        "checkgp",
+        "dgc"
+    ],
+    "author": "Elia Lazzari",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Elius94/validate-c19-node-wrapper-executable/issues"
+    },
+    "homepage": "https://github.com/Elius94/validate-c19-node-wrapper-executable#readme"
 }
