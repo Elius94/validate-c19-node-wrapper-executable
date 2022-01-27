@@ -17,7 +17,7 @@ var run = function(args) {
 describe('Test app', function() {
     it(`should work with params ['--version']`, async() => {
         const result = await run(['--version']);
-        result.stdout.should.equal("1.0.0\n");
+        result.stdout.should.equal("1.1.0\n");
     });
     it(`should work with params ['--short', '--no-signature', 'test/SK_1.png'] and be NOT_VALID`, async() => {
         const result = await run(['--short', '--no-signature', 'test/SK_1.png'])
@@ -39,9 +39,9 @@ describe('Test app', function() {
         const result = await run(['--short', '--no-signature', 'test/example_qr_vaccine_recovery.png'])
         result.stdout.should.equal('VALID\n');
     });
-    it(`should work with params ['--short', '--no-signature', 'test/valid_italian.png'] and be VALID`, async() => {
+    it(`should work with params ['--short', '--no-signature', 'test/valid_italian.png'] and be NOT_VALID`, async() => {
         const result = await run(['--short', '--no-signature', 'test/valid_italian.png'])
-        result.stdout.should.equal('VALID\n');
+        result.stdout.should.equal('NOT_VALID\n');
     });
     it(`should work with params ['--short', '--no-signature', 'test/italian_molecular.png'] and be NOT_VALID`, async() => {
         const result = await run(['--short', '--no-signature', 'test/italian_molecular.png'])

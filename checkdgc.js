@@ -1,10 +1,13 @@
 const { Validator, Service, Certificate } = require('verificac19-sdk');
+const crlManager = require('./crlmanager');
 
-const version = '1.0.0';
+const version = '1.1.0';
 const verbose = process.argv.includes('--verbose');
 const shortMode = process.argv.includes('--short');
-const update = !process.argv.includes('--no-update');
-const mode = process.argv.includes('--super') ? Validator.mode.SUPER_DGP : Validator.mode.NORMAL_DGP;
+const printAll = process.argv.includes('--all');
+const waitkey = process.argv.includes('--waitkey');
+const noUpdate = process.argv.includes('--no-update');
+const mode = process.argv.includes('--super') ? Validator.mode.SUPER_DGP : process.argv.includes('--booster') ? Validator.mode.BOOSTER_DGP : Validator.mode.NORMAL_DGP;
 const signature = !process.argv.includes('--no-signature');
 
 /**
@@ -21,14 +24,14 @@ const validateGreenPass = async() => {
                 console.log(version);
                 return;
             }
-            if (update) {
+            if (!noUpdate) {
                 log('Updating greenpass rules...');
-                await Service.updateAll();
+                await Service.updateAll(crlManager);
             }
             let img = ""
-            if (process.argv.includes('--base64')) {
-                log('Reading base64 image data...');
-                img = await Certificate.fromRaw(process.argv[process.argv.indexOf('--base64') + 1]);
+            if (process.argv.includes('--raw')) {
+                log('Reading raw qr data...');
+                img = await Certificate.fromRaw(process.argv[process.argv.length - 1]);
             } else {
                 log('Reading image file...');
                 img = await Certificate.fromImage(process.argv[process.argv.length - 1]);
@@ -44,7 +47,7 @@ const validateGreenPass = async() => {
                 if (shortMode) {
                     console.log(validationResult.code);
                 } else {
-                    console.log(JSON.stringify(validationResult, null, 2));
+                    printAll ? console.log(JSON.stringify(img, null, 2)) : console.log(JSON.stringify(validationResult, null, 2));
                 }
             }
         } catch (error) {
@@ -81,11 +84,14 @@ function printHelp() {
         `  --help                 Print this help message\n` +
         `  --version              Print the version of this tool\n` +
         `  --verbose              Print verbose output\n` +
-        `  --base64 <base64>      Validate a certificate image encoded in base64\n` +
+        `  --raw                  Validate a certificate giving the qr extracted string\n` +
         `  --short                Print only the validation code\n` +
+        `  --print-all            Print all the certificate in JSON format\n` +
         `  --super                Use the super DGP rules\n` +
+        `  --booster              Use the booster DGP rules\n` +
         `  --no-signature         Skip signature validation\n` +
         `  --no-update            Skip update of the DGP rules\n` +
+        `  --waitkey              Wait for a keypress before exiting\n` +
         `\n\n` +
         `Examples:\n` +
         `  checkdgc --verbose --short --super --no-signature --no-update image.png\n` +
@@ -96,5 +102,15 @@ function printHelp() {
 
 (async() => {
     await validateGreenPass();
-    process.exit(0);
+    // wait for user input to exit
+    if (waitkey) {
+        console.log('\n\nPress any key to exit...');
+        process.stdin.resume();
+        process.stdin.setEncoding('utf8');
+        process.stdin.on('data', function(text) {
+            process.exit(0);
+        });
+    } else {
+        process.exit(0);
+    }
 })()
